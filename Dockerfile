@@ -10,14 +10,9 @@ RUN mkdir -p /opt/dashing && \
     gem install dashing && \
     gem install rspec
 
-RUN apt-get -y -q install python python-pip && \
-    pip install --upgrade pip && \
-    pip install --user firebase-admin
-
 VOLUME /app
 WORKDIR /app
 
 EXPOSE 3030
 
-CMD ["bash", "-c", "bundle install && dashing start"]
-#CMD ["bash", "-c", "dashing start"]
+CMD ["bash", "-c", "bundle install --path vendor/bundle && dashing start"]

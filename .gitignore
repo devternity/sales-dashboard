@@ -10,6 +10,7 @@ Session.vim
 *.iws
 .idea/
 
+vendor/
 *.gem
 *.rbc
 /.config
