@@ -28,8 +28,8 @@ class DevternityFirebaseStats
   def call(job)
     begin
       sales = counts()
-      send_event('companies', {title: 'Companies rand 15', moreinfo: "Total #{sales[:companies].size}", items: sales[:companies].sort_by { rand }.take(15).map {|name, count| {label: name, value: count}}})
-      send_event('titles',    {title: 'Titles rand 5', moreinfo: "Total #{sales[:titles].size}", items: sales[:titles].sort_by { rand }.take(5).map {|name, count| {label: name, value: count}}})
+      send_event('companies', {title: 'Companies top 15', moreinfo: "Total #{sales[:companies].size}", items: sales[:companies].sort_by { |name, count| -count }.take(15).map {|name, count| {label: name, value: count}}})
+      send_event('titles',    {title: 'Titles top 15', moreinfo: "Total #{sales[:titles].size}", items: sales[:titles].sort_by { |name, count| -count  }.take(15).map {|name, count| {label: name, value: count}}})
 
       send_event('tickets',   {moreinfo: "Total #{sales[:total]}", items: sales[:tickets].sort_by {|name, count| -count}.map {|name, count| {label: name, value: count}}})
 
@@ -106,7 +106,7 @@ class DevternityFirebaseStats
 
   def normalize_company(name)
     return '<<NULL>>' unless name
-    name.strip.upcase
+    result = name.strip.upcase
         .gsub(/"/, '')
         .gsub(/\./, '')
         .gsub(/-/, ' ')
@@ -118,6 +118,8 @@ class DevternityFirebaseStats
         .reject {|el| /^LTD$/.match(el)}
         .reject {|el| /^UG$/.match(el)}
         .join(' ')
+    result = 'IF P&C' if /IF P&C/.match(result)
+    result
   end
 end
 
