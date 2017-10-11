@@ -33,8 +33,9 @@ class DevternityFirebaseStats
 
       send_event('tickets',   {moreinfo: "Total #{sales[:total]}", items: sales[:tickets].sort_by {|name, count| -count}.map {|name, count| {label: name, value: count}}})
 
-      send_event('keynotes',  {moreinfo: "#{sales[:tickets]["KEYNOTES_(DAY_I)"]}/700", value: sales[:tickets]["KEYNOTES_(DAY_I)"]})
-      send_event('workshops', {moreinfo: "#{sales[:total] - sales[:tickets]["KEYNOTES_(DAY_I)"]}/700", value: sales[:total] - sales[:tickets]["KEYNOTES_(DAY_I)"]})
+      day1Tickets = sales[:tickets]["KEYNOTES_(DAY_I)"]
+      send_event('keynotes', {moreinfo: "#{day1Tickets}/#{600}", value: day1Tickets})
+      send_event('workshops', {moreinfo: "#{sales[:total] - day1Tickets}/#{350}", value: sales[:total] - day1Tickets})
     end
   rescue => e
     puts e.backtrace
@@ -83,7 +84,7 @@ class DevternityFirebaseStats
     }
 
     data.each do |id, application|
-      order_tickets = application[:orders].map {|order| order[:tickets]}.select {|t| t}.flatten.map {|name| name || '<<NULL>>'}
+      order_tickets = application[:orders].map {|order| order[:tickets]}.select {|t| t}.flatten.select {|t| t}
       ticket_counters = counter.call(order_tickets)
       tickets = merger.call(tickets, ticket_counters)
 
@@ -100,12 +101,12 @@ class DevternityFirebaseStats
   end
 
   def normalize_title(title)
-    return '<<NULL>>' unless title
+    return '-- ' unless title
     title.split('@')[0].strip.downcase
   end
 
   def normalize_company(name)
-    return '<<NULL>>' unless name
+    return '-- ' unless name
     result = name.strip.upcase
         .gsub(/"/, '')
         .gsub(/\./, '')
