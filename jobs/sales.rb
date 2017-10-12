@@ -30,9 +30,7 @@ class DevternityFirebaseStats
       sales = counts()
       send_event('companies', {title: 'Companies top 15', moreinfo: "Total #{sales[:companies].size}", items: sales[:companies].sort_by { |name, count| -count }.take(15).map {|name, count| {label: name, value: count}}})
       send_event('titles',    {title: 'Titles top 15', moreinfo: "Total #{sales[:titles].size}", items: sales[:titles].sort_by { |name, count| -count  }.take(15).map {|name, count| {label: name, value: count}}})
-
       send_event('tickets',   {moreinfo: "Total #{sales[:total]}", items: sales[:tickets].sort_by {|name, count| -count}.map {|name, count| {label: name, value: count}}})
-
       day1Tickets = sales[:tickets]["KEYNOTES_(DAY_I)"]
       send_event('keynotes', {moreinfo: "#{day1Tickets}/#{600}", value: day1Tickets})
       send_event('workshops', {moreinfo: "#{sales[:total] - day1Tickets}/#{350}", value: sales[:total] - day1Tickets})
@@ -112,6 +110,15 @@ class DevternityFirebaseStats
         .gsub(/\./, '')
         .gsub(/-/, ' ')
         .split(' ')
+        .reject {|el| /^SHARED$/.match(el)}
+        .reject {|el| /^SERVICE$/.match(el)}
+        .reject {|el| /^CENTER$/.match(el)}
+        .reject {|el| /^COMPETENCE$/.match(el)}
+        .reject {|el| /^CONSULTING$/.match(el)}
+        .reject {|el| /^CLOUD$/.match(el)}
+        .reject {|el| /^LATVIA$/.match(el)}
+        .reject {|el| /^OY$/.match(el)}
+        .reject {|el| /^IT$/.match(el)}
         .reject {|el| /^SIA$/.match(el)}
         .reject {|el| /^GMBH$/.match(el)}
         .reject {|el| /^AS$/.match(el)}

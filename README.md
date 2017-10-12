@@ -1,4 +1,5 @@
-DT Sales Dashboard
+
+DevTernity Sales Dashboard
 ==========================
 
 tbd
