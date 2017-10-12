@@ -11,8 +11,9 @@ Vagrant.configure("2") do |config|
     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
   end
 
-  config.vm.provision "shell", inline: "sudo apt update -y"
-  config.vm.provision "shell", inline: "sudo apt -y -q install ruby ruby-dev nodejs g++ bundler travis"
+  config.vm.provision "shell", inline: "sudo apt -y -q update"
+  config.vm.provision "shell", inline: "sudo apt -y -q uprade"
+  config.vm.provision "shell", inline: "sudo apt -y -q install ruby ruby-dev bundler"
   config.vm.provision "shell", inline: "sudo gem install dashing"
   config.vm.provision "shell", inline: "sudo gem install rspec"
   config.vm.provision "shell", inline: "cd /vagrant && bundle install --path vendor/bundle"

@@ -18,13 +18,15 @@ $SSH sudo tar -zxvf /tmp/dashboard.tgz --no-same-owner -C /dashboard
 
 # Restart service
 $SSH <<EOF
+  echo ">>>> Stopping service"
+  sudo systemctl stop dashing 
   echo ">>>> Installing bundler"
   cd /dashboard && bundler install
   echo ">>>> Enabling service"
   sudo systemctl disalbe dashing.service
   sudo systemctl enable /dashboard/dashing.service
   echo ">>>> Restarting service"
-  sudo service dashing restart
+  sudo systemctl start dashing 
   echo ">>>> Sleeping"
   sleep 5
   echo ">>>> Showing logs"
