@@ -13,6 +13,7 @@ $SSH sudo mkdir -p /dashboard
 $SSH sudo tar -zxvf /tmp/dashboard.tgz --no-same-owner -C /dashboard
 
 # Copy configuration
+# TODO
 
 # Restart service
 $SSH <<EOF
