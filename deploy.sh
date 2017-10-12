@@ -32,6 +32,8 @@ $SSH <<EOF
   echo ">>>> Sleeping"
   sleep 5
   echo ">>>> Showing logs"
+  sudo tail -100 /var/dashing_output.log
+  sudo tail -100 /var/dashing_error.log
   sudo journalctl -xn --no-pager -u dashing.service
   echo ">>>> Checking status"
   sudo systemctl -q is-active dashing
