@@ -5,7 +5,7 @@ After=syslog.target network.target
 [Service]
 Type=forking
 WorkingDirectory=/dashboard/
-ExecStart=/usr/local/bin/dashing start -d -p 8005 --pid /var/run/thin.pid
+ExecStart=/usr/local/bin/dashing start -p 80 --pid /var/run/thin.pid
 ExecStop=/usr/local/bin/dashing stop
 
 [Install]

@@ -2,13 +2,11 @@ sudo: required
 language: ruby
 cache: bundler
 script:
-- bundle install
-- rm -rf dashboard.tgz
-- tar -czf dashboard.tgz ./assets ./dashboards ./jobs ./public ./widgets ./config.ru
-  ./Gemfile* ./dashing.service
+  - bundle install
+  - rm -rf dashboard.tgz
+  - tar -czf dashboard.tgz ./assets ./dashboards ./jobs ./public ./widgets ./config.ru ./Gemfile* ./dashing.service
 before_install:
-- openssl aes-256-cbc -K $encrypted_1645300b04d0_key -iv $encrypted_1645300b04d0_iv
-  -in deploy.key.enc -out deploy.key -d
+  - openssl aes-256-cbc -K $encrypted_1645300b04d0_key -iv $encrypted_1645300b04d0_iv -in deploy.key.enc -out deploy.key -d
 deploy:
   skip_cleanup: true
   provider: script

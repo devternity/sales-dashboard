@@ -13,7 +13,7 @@ $SSH sudo mkdir -p /dashboard
 $SSH sudo tar -zxvf /tmp/dashboard.tgz --no-same-owner -C /dashboard
 
 # Copy configuration
-# TODO
+# TODO: so far it is a manual copy
 
 # Restart service
 $SSH <<EOF
@@ -21,5 +21,6 @@ $SSH <<EOF
   sudo systemctl enable /dashboard/dashing.service
   sudo service dashing restart
   sleep 5
+  journalctl -u dashing.service --until "1 hour ago"
   sudo systemctl -q is-active dashing
 EOF
