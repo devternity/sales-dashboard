@@ -1,18 +1,16 @@
 sudo: required
-
 language: ruby
-
 cache: bundler
-
 script:
   - bundle install
-
 before_install:
   - openssl aes-256-cbc -K $encrypted_424929f292a8_key -iv $encrypted_424929f292a8_iv -in deploy.key.enc -out deploy.key -d
-
 deploy:
   skip_cleanup: true
   provider: script
   script: deploy.sh
   on:
     branch: master
+env:
+  global:
+    secure: nV3l7b5x3Bo/kQyRe57ZOOHKVPtzhFKykQdd7QoIEQzztvwEErX1nJoRflr0+FdU/dk0BtPvaeo1oXxiPOUUQigbRa+wJHyGW5dCIpHKWU6AkZnDHJG5bLbKYD96bpESFds/z1mD+4uuTUAbE74Vin2SLZxhK/SKCFCe5fiYn2AvCTYnD0g/llKoaK3lgkChrBuk+gdaco6XdMeEatvXKhaac2SANtOMoAdW1hQFmuekIwWVtMQ+Zh7W5wsCQ+g0QUV8zC0/usrwfnLJ2o+MXqZW6I2EjGc0isr9v6Qk+aHKUPZMp8J7uPAVWP+cMw2SQYp3hxnLOFAs+aA6OLMENCDfQLQQ5FvPFFRABLfabiug//AdDoZmH0UlQKIjEribnHShrh8haqfHbP7CXz5dR6K3sCITRIGfxKGWYtGu0bcZ25TsjN4AeNpYhAgtFBx9zD/er3A4hHQxKbNkxizC8xeFkis69lFv2gtymXhwi+V3ikHyupIxOkiYt0wwSsUSzv38uM1GH9QLEqLqJ64jGqApQkRcibg93x/NRMUds7HlEdHjAPqNkVYfw4MKPfVfHzSPG5p7blpXM+UXxLPkWKpWp56m9Uzv0t9T5yhALftFlz7xZXTH0VUZWa/avFoL66m8L1EH5kDnpo0ER6muAbacq8uReQYVyigs8iCgjeY=
