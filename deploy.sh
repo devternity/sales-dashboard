@@ -24,7 +24,9 @@ $SSH <<EOF
   cd /dashboard && bundler install
   echo ">>>> Enabling service"
   sudo systemctl disable dashing.service
+  sudo systemctl daemon-reload
   sudo systemctl enable /dashboard/dashing.service
+  sudo systemctl daemon-reload
   echo ">>>> Restarting service"
   sudo systemctl start dashing 
   echo ">>>> Sleeping"
