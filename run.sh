@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-IMAGE=devternity-sales
+IMAGE=devternity/sales
 NAME=dashboard
 docker build -t ${IMAGE} .
 
@@ -11,6 +11,5 @@ docker run -it \
   -p 3030:3030 \
   -v $PWD:/app \
   --name ${NAME} \
-  \
   ${IMAGE}
 
