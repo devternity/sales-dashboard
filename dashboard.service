@@ -1,0 +1,12 @@
+[Unit]
+Description=Dashing Dashboard
+After=syslog.target network.target
+
+[Service]
+Type=forking
+WorkingDirectory=/dashboard/
+ExecStart=/usr/local/bin/dashing start -d -p 8005 --pid /var/run/thin.pid
+ExecStop=/usr/local/bin/dashing stop
+
+[Install]
+WantedBy=multi-user.target
