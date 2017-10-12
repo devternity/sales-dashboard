@@ -46,3 +46,4 @@ Gemfile.lock
 history.yml
 
 *.key
+*.tgz
