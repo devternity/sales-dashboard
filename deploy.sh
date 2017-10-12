@@ -17,10 +17,16 @@ $SSH sudo tar -zxvf /tmp/dashboard.tgz --no-same-owner -C /dashboard
 
 # Restart service
 $SSH <<EOF
+  echo ">>>> Installing bundler"
   cd /dashboard && bundler install
+  echo ">>>> Enabling service"
   sudo systemctl enable /dashboard/dashing.service
+  echo ">>>> Restarting service"
   sudo service dashing restart
+  echo ">>>> Sleeping"
   sleep 5
-  journalctl -u dashing.service --until "1 hour ago"
+  echo ">>>> Showing logs"
+  journalctl -xn --no-pager -u dashing.service
+  echo ">>>> Checking status"
   sudo systemctl -q is-active dashing
 EOF
