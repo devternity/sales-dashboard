@@ -7,8 +7,8 @@ Type=simple
 WorkingDirectory=/dashboard/
 ExecStart=/usr/local/bin/dashing start -p 80 --pid /var/run/thin.pid
 ExecStop=/usr/local/bin/dashing stop
-StandardOutput=/var/dashing_output.log
-StandardError=/var/dashing_error.log
+StandardOutput=journal+console
+StandardError=journal+console
 
 [Install]
 WantedBy=multi-user.target

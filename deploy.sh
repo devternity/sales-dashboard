@@ -30,10 +30,8 @@ $SSH <<EOF
   echo ">>>> Restarting service"
   sudo systemctl start dashing 
   echo ">>>> Sleeping"
-  sleep 5
+  sleep 20
   echo ">>>> Showing logs"
-  sudo tail -100 /var/dashing_output.log
-  sudo tail -100 /var/dashing_error.log
   sudo journalctl -xn --no-pager -u dashing.service
   echo ">>>> Checking status"
   sudo systemctl -q is-active dashing
