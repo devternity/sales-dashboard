@@ -28,7 +28,6 @@ $SSH <<EOF
   sleep 5
   echo ">>>> Showing logs"
   sudo journalctl -xn --no-pager -u dashing.service
-  sudo tail -100 /dashboard/log/thin.log
   echo ">>>> Checking status"
   sudo systemctl -q is-active dashing
 EOF

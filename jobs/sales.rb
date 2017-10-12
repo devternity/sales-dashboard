@@ -109,6 +109,7 @@ class DevternityFirebaseStats
         .gsub(/"/, '')
         .gsub(/\./, '')
         .gsub(/-/, ' ')
+        .gsub(/”/, ' ')
         .split(' ')
         .reject {|el| /^SHARED$/.match(el)}
         .reject {|el| /^SERVICE$/.match(el)}
