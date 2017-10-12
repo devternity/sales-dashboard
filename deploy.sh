@@ -9,11 +9,12 @@ chmod 400 $DEPLOY_KEY
 scp -o StrictHostKeyChecking=no -i $DEPLOY_KEY dashboard.tgz $DEPLOY_USER@$DEPLOY_HOST:/tmp
 
 # Deploy dashboard code
-$SSH sudo mkdir -p /dashboard
+$SSH sudo mkdir -p /dashboard/config
 $SSH sudo tar -zxvf /tmp/dashboard.tgz --no-same-owner -C /dashboard
 
 # Copy configuration
 # TODO: so far it is a manual copy
+# openssl enc -aes-256-cbc -pass env:DEPLOY_PASSWORD -d -a -in "config/devternity.yml" 2> /dev/null
 
 # Restart service
 $SSH <<EOF
