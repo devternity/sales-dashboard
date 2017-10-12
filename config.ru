@@ -1,4 +1,7 @@
 require 'dashing'
+require 'yaml'
+
+$global_config = YAML.load_file('./config/devternity.yml')
 
 configure do
   set :auth_token, 'YOUR_AUTH_TOKEN'
@@ -14,7 +17,7 @@ configure do
 
     def authorized?
       @auth ||=  Rack::Auth::Basic::Request.new(request.env)
-      @auth.provided? && @auth.basic? && @auth.credentials && @auth.credentials == ['admin', 'admin']
+      @auth.provided? && @auth.basic? && @auth.credentials && @auth.credentials == [$global_config['username'], $global_config['password']]
     end
 
   end
