@@ -20,13 +20,15 @@ $SSH <<EOF
   echo ">>>> Installing bundler"
   cd /dashboard && bundler install
   echo ">>>> Enabling service"
+  sudo systemctl disalbe dashing.service
   sudo systemctl enable /dashboard/dashing.service
   echo ">>>> Restarting service"
   sudo service dashing restart
   echo ">>>> Sleeping"
   sleep 5
   echo ">>>> Showing logs"
-  journalctl -xn --no-pager -u dashing.service
+  sudo journalctl -xn --no-pager -u dashing.service
+  sudo tail -100 /dashboard/log/thin.log
   echo ">>>> Checking status"
   sudo systemctl -q is-active dashing
 EOF
