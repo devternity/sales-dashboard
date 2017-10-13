@@ -3,8 +3,6 @@ language: ruby
 cache: bundler
 script:
   - bundle install
-  - rm -rf dashboard.tgz
-  - tar -czf dashboard.tgz ./assets ./dashboards ./jobs ./public ./widgets ./config.ru ./Gemfile* ./dashing.service
 deploy:
   skip_cleanup: true
   provider: script
