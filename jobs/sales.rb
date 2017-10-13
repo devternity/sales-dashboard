@@ -102,7 +102,9 @@ class DevternityFirebaseStats
 
   def normalize_title(title)
     return '-- ' unless title
-    result = title.split('@')[0].strip.downcase
+    result = title.downcase
+        .split('@')[0].strip
+        .split(' at ')[0].strip
         .gsub(/^.*?izstrādātājs.*$/, 'software developer')
         .gsub(/^.*?vadītājs.*$/, 'manager')
         .gsub(/padawan\s*/, '') 
