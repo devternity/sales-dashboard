@@ -8,10 +8,13 @@ openssl aes-256-cbc -K $encrypted_1645300b04d0_key -iv $encrypted_1645300b04d0_i
 chmod 400 $DEPLOY_KEY
 
 # Decrypt configuration
-# TODO: so far it is a manual copy
-# openssl enc -aes-256-cbc -pass env:SECRET_PASSWORD -d -a -in config/devternity.yml -out config/devternity.yml
-# openssl enc -aes-256-cbc -pass env:SECRET_PASSWORD -d -a -in config/devternity.yml -out config/devternity.yml
-# openssl enc -aes-256-cbc -pass env:SECRET_PASSWORD -d -a -in config/devternity.yml -out config/devternity.yml
+function decrypt() {
+  filename="$1"
+  openssl enc -aes-256-cbc -pass env:SECRET_PASSWORD -d -a -in "${filename}" -out "${filename}.dec" && rm -f "${filename}" && mv "${filename}.dec" "${filename}"
+} 
+decrypt config/devternity.yml
+decrypt config/firebase.json
+decrypt config/firebase-legacy.json
 
 # Create artifact 
 rm -rf dashboard.tgz
