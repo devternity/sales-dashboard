@@ -18,7 +18,7 @@ decrypt config/firebase-legacy.json
 
 # Create artifact 
 rm -rf dashboard.tgz
-tar -czf dashboard.tgz ./assets ./dashboards ./jobs ./public ./widgets ./config.ru ./Gemfile* ./dashing.service
+tar -czf dashboard.tgz ./config ./assets ./dashboards ./jobs ./public ./widgets ./config.ru ./Gemfile* ./dashing.service
 
 # Copy artifact to remote host
 scp -o StrictHostKeyChecking=no -i $DEPLOY_KEY dashboard.tgz $DEPLOY_USER@$DEPLOY_HOST:/tmp
