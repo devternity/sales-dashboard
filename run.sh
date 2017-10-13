@@ -5,9 +5,9 @@ NAME=dashboard
 docker build -t ${IMAGE} .
 
 (docker container ls -a | grep ${NAME}) && \
-  (docker container rm -fv ${NAME} || echo "Could not remove ${NAME}")
+   (docker container rm -fv ${NAME} || echo "Could not remove ${NAME}")
 
-docker run -it \
+docker run -dit \
   -p 3030:3030 \
   -v $PWD:/app \
   --name ${NAME} \

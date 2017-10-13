@@ -47,3 +47,5 @@ history.yml
 
 *.key
 *.tgz
+log/
+tmp/
