@@ -11,7 +11,7 @@ Vagrant.configure("2") do |config|
     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
   end
 
-  config.vm.provision "shell", inline: "cd /vagrant && sudo ./run.sh"
+  config.vm.provision "shell", inline: "cd /vagrant && sudo ./run-docker.sh"
 
 end
 
