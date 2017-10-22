@@ -115,6 +115,7 @@ class DevternityFirebaseStats
         .gsub(/^sw developer$/, 'software developer')
         .gsub(/^developer$/, 'software developer')        
         .gsub(/^senior developer$/, 'senior software developer') 
+        .gsub(/^system architect$/, 'software architect')        
         .gsub(/^architect$/, 'software architect')        
         .gsub(/software/, 'sw')            
     result                                     
