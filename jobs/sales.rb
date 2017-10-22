@@ -35,7 +35,7 @@ class DevternityFirebaseStats
       send_event('tickets',   {moreinfo: "Total #{sales[:total]}", items: sales[:tickets].sort_by {|name, count| -count}.map {|name, count| {label: name, value: count}}})
       day1Tickets = sales[:tickets]["KEYNOTES_(DAY_I)"]
       send_event('keynotes', {moreinfo: "#{day1Tickets}/#{600}", value: day1Tickets})
-      send_event('workshops', {moreinfo: "#{sales[:total] - day1Tickets}/#{350}", value: sales[:total] - day1Tickets})
+      send_event('workshops', {moreinfo: "#{sales[:total] - day1Tickets}/#{200}", value: sales[:total] - day1Tickets})
     end
   rescue => e
     puts e.backtrace
