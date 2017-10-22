@@ -111,6 +111,8 @@ class DevternityFirebaseStats
         .gsub(/engineer/, 'developer')
         .gsub(/havi/, 'developer')
         .gsub(/mintos/, 'developer')        
+        .gsub(/eazybi/, 'developer')            
+        .gsub(/programmer/, 'developer')                
         .gsub(/^dev$/, 'developer')        
         .gsub(/^sw developer$/, 'software developer')
         .gsub(/^developer$/, 'software developer')        
