@@ -114,6 +114,7 @@ class DevternityFirebaseStats
         .gsub(/^dev$/, 'developer')        
         .gsub(/^sw developer$/, 'software developer')
         .gsub(/^developer$/, 'software developer')        
+        .gsub(/^senior developer$/, 'senior software developer') 
         .gsub(/^architect$/, 'software architect')        
     result                                     
   end
@@ -129,6 +130,9 @@ class DevternityFirebaseStats
         .reject {|el| /^SHARED$/.match(el)}
         .reject {|el| /^SERVICE$/.match(el)}
         .reject {|el| /^CENTER$/.match(el)}
+        .reject {|el| /^CENTRE$/.match(el)}
+        .reject {|el| /^SOFTWARE$/.match(el)}    
+        .reject {|el| /^DEVELOPMENT$/.match(el)}        
         .reject {|el| /^COMPETENCE$/.match(el)}
         .reject {|el| /^CONSULTING$/.match(el)}
         .reject {|el| /^CLOUD$/.match(el)}
