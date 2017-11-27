@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:16.04
 
 RUN apt-get -y -q update && \
     apt-get -y -q upgrade
