@@ -15,4 +15,9 @@ WORKDIR /app
 
 EXPOSE 3030
 
-CMD ["bash", "-c", "bundle install --path /tmp/bundle && dashing start -P /var/run/thin.pid"]
+CMD ["bash", "-c", \
+  "echo Setting up dependencies && \
+   bundle install --path /app/vendor && \
+   echo && \
+   echo Starting up dashing on http://127.0.0.1:3030/sales && \
+   dashing start -P /var/run/thin.pid"]

@@ -49,3 +49,4 @@ history.yml
 *.tgz
 log/
 tmp/
+.vscode/

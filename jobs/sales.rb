@@ -13,9 +13,12 @@ $firebase_config = JSON.parse(open($global_config['firebase_config']) {|f| f.rea
 
 ###########################################################################
 
-#require 'pry'
-#require 'pry-byebug'
+# require 'pry'
+# require 'pry-byebug'
 require 'firebase'
+
+DT2018_PRODUCTS = ['DT_RIX_18']
+DT2018_DAY1_KEYNOTE = 'Main Day Pass'
 
 class DevternityFirebaseStats
   attr_reader :client
@@ -30,10 +33,9 @@ class DevternityFirebaseStats
   def call(job)
     begin
       sales = counts()
-      send_event('companies', {title: 'Companies top 15', moreinfo: "Total #{sales[:companies].size}", items: sales[:companies].sort_by { |name, count| -count }.take(15).map {|name, count| {label: name, value: count}}})
-      send_event('titles',    {title: 'Titles top 15', moreinfo: "Total #{sales[:titles].size}", items: sales[:titles].sort_by { |name, count| -count  }.take(15).map {|name, count| {label: name, value: count}}})
-      send_event('tickets',   {moreinfo: "Total #{sales[:total]}", items: sales[:tickets].sort_by {|name, count| -count}.map {|name, count| {label: name, value: count}}})
-      day1Tickets = sales[:tickets]["KEYNOTES_(DAY_I)"]
+      event_stats = sales[:tickets].sort_by {|name, count| -count}.map {|name, count| {label: name, value: count}}
+      send_event('tickets', {title: "#{sales[:total]} tickets purchased", moreinfo: "Total #{sales[:total]}", items: event_stats})
+      day1Tickets = sales[:tickets][DT2018_DAY1_KEYNOTE]
       send_event('keynotes', {moreinfo: "#{day1Tickets}/#{600}", value: day1Tickets})
       send_event('workshops', {moreinfo: "#{sales[:total] - day1Tickets}/#{200}", value: sales[:total] - day1Tickets})
     end
@@ -50,30 +52,22 @@ class DevternityFirebaseStats
   end
 
   def clean_applications(data = raw_applications())
-    data.map {|id, application|
-      [
-          id,
-          {
-              company: application['companyName'],
-              orders: application['orders'].select {|order| order}
-                              .map {|order|
-                                {
-                                    title: order['headline'],
-                                    tickets: order['tickets'].is_a?(Hash) ? order['tickets'].values : order['tickets']
-                                }}
-          }
-      ]
+    dt2018_data = data.select {|id, application| DT2018_PRODUCTS.include?(application['product']) }
+    dt2018_data.map {|id, application|
+      tickets = application['tickets'] || [DT2018_DAY1_KEYNOTE]
+      tickets = [tickets] unless tickets.is_a? Array
+      tickets = tickets.map {|ticket| ticket['event'] || DT2018_DAY1_KEYNOTE}
+
+      [ id, { tickets: tickets }]
     }.to_h
   end
 
   def counts(data = clean_applications())
-    company_tickets = Hash.new(0)
     tickets = Hash.new(0)
-    titles = Hash.new(0)
 
-    counter = -> hash {
+    counter = -> names {
       counted = Hash.new(0)
-      hash.each {|h| counted[h] += 1}
+      names.each {|h| counted[h] += 1}
       counted = Hash[counted.map {|k, v| [k, v]}]
       counted
     }
@@ -84,75 +78,16 @@ class DevternityFirebaseStats
     }
 
     data.each do |id, application|
-      order_tickets = application[:orders].map {|order| order[:tickets]}.select {|t| t}.flatten.select {|t| t}
+      order_tickets = application[:tickets].flatten
       ticket_counters = counter.call(order_tickets)
       tickets = merger.call(tickets, ticket_counters)
 
-      order_titles = application[:orders].map {|order| order[:title]}.map {|title| normalize_title(title)}.select {|title| title}.flatten
-      title_counters = counter.call(order_titles)
-      titles = merger.call(titles, title_counters)
-
-      totals = ticket_counters.values.inject(0, :+)
-
-      company_tickets[normalize_company(application[:company])] += totals
+      totals = ticket_counters.values.inject(0, :+)  
     end
 
-    {companies: company_tickets, tickets: tickets, titles: titles, total: tickets.values.inject(0, :+)}
+    {tickets: tickets, total: tickets.values.inject(0, :+)}
   end
 
-  def normalize_title(title)
-    return '-- ' unless title
-    result = title.downcase
-        .split('@')[0].strip
-        .split(' at ')[0].strip
-        .gsub(/^.*?izstrādātājs.*$/, 'software developer')
-        .gsub(/^.*?vadītājs.*$/, 'manager')
-        .gsub(/padawan\s*/, '') 
-        .gsub(/engineer/, 'developer')
-        .gsub(/havi/, 'developer')
-        .gsub(/mintos/, 'developer')        
-        .gsub(/eazybi/, 'developer')            
-        .gsub(/programmer/, 'developer')                
-        .gsub(/^dev$/, 'developer')        
-        .gsub(/^sw developer$/, 'software developer')
-        .gsub(/^developer$/, 'software developer')        
-        .gsub(/^senior developer$/, 'senior software developer') 
-        .gsub(/^system architect$/, 'software architect')        
-        .gsub(/^architect$/, 'software architect')        
-        .gsub(/software/, 'sw')            
-    result                                     
-  end
-
-  def normalize_company(name)
-    return '-- ' unless name
-    result = name.strip.upcase
-        .gsub(/"/, '')
-        .gsub(/\./, '')
-        .gsub(/-/, ' ')
-        .gsub(/”/, ' ')
-        .split(' ')
-        .reject {|el| /^SHARED$/.match(el)}
-        .reject {|el| /^SERVICE$/.match(el)}
-        .reject {|el| /^CENTER$/.match(el)}
-        .reject {|el| /^CENTRE$/.match(el)}
-        .reject {|el| /^SOFTWARE$/.match(el)}    
-        .reject {|el| /^DEVELOPMENT$/.match(el)}        
-        .reject {|el| /^COMPETENCE$/.match(el)}
-        .reject {|el| /^CONSULTING$/.match(el)}
-        .reject {|el| /^CLOUD$/.match(el)}
-        .reject {|el| /^LATVIA$/.match(el)}
-        .reject {|el| /^OY$/.match(el)}
-        .reject {|el| /^IT$/.match(el)}
-        .reject {|el| /^SIA$/.match(el)}
-        .reject {|el| /^GMBH$/.match(el)}
-        .reject {|el| /^AS$/.match(el)}
-        .reject {|el| /^AB$/.match(el)}
-        .reject {|el| /^LTD$/.match(el)}
-        .reject {|el| /^UG$/.match(el)}
-        .join(' ')
-    result = 'IF P&C' if /IF P&C/.match(result)
-    result
-  end
 end
 
 SCHEDULER.every '1m', DevternityFirebaseStats.new($firebase_config)

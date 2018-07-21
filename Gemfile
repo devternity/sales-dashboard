@@ -4,5 +4,3 @@ gem 'dashing'
 gem 'firebase'
 
 gem 'pry-byebug'
-
-
