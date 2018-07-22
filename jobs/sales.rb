@@ -19,6 +19,7 @@ require 'firebase'
 
 DT2018_PRODUCTS = ['DT_RIX_18']
 DT2018_DAY1_KEYNOTE = 'Main Day Pass'
+DT2018_ERROR_TICKETS_EVENT = 'Error: Tickets data error'
 
 class DevternityFirebaseStats
   attr_reader :client
@@ -54,9 +55,9 @@ class DevternityFirebaseStats
   def clean_applications(data = raw_applications())
     dt2018_data = data.select {|id, application| DT2018_PRODUCTS.include?(application['product']) }
     dt2018_data.map {|id, application|
-      tickets = application['tickets'] || [DT2018_DAY1_KEYNOTE]
+      tickets = application['tickets'] || [DT2018_ERROR_TICKETS_EVENT]
       tickets = [tickets] unless tickets.is_a? Array
-      tickets = tickets.map {|ticket| ticket['event'] || DT2018_DAY1_KEYNOTE}
+      tickets = tickets.map {|ticket| ticket['event'] || DT2018_ERROR_TICKETS_EVENT}
 
       [ id, { tickets: tickets }]
     }.to_h
