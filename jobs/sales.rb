@@ -91,5 +91,5 @@ class DevternityFirebaseStats
 
 end
 
-SCHEDULER.every '1m', DevternityFirebaseStats.new($firebase_config)
+SCHEDULER.every '1h', DevternityFirebaseStats.new($firebase_config)
 SCHEDULER.at Time.now, DevternityFirebaseStats.new($firebase_config)
