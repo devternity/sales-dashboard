@@ -21,6 +21,18 @@ DT2018_PRODUCTS = ['DT_RIX_18']
 DT2018_DAY1_KEYNOTE = 'Main Day Pass'
 DT2018_ERROR_TICKETS_EVENT = 'Error: Tickets data error'
 
+WORKSHOP_CAPACITIES = {
+  "KC A" => 36,
+  "KC B" => 45,
+  "KC C" => 45,
+  "KC D" => 44,
+  "R 78" => 50,
+  "R 75" => 16
+}
+
+WORKSHOP_CAPACITY = WORKSHOP_CAPACITIES.map { |k,v| v }.sum
+MAIN_DAY_CAPACITY = 600
+
 class DevternityFirebaseStats
   attr_reader :client
 
@@ -33,12 +45,15 @@ class DevternityFirebaseStats
 
   def call(job)
     begin
+      capacities = WORKSHOP_CAPACITIES.merge({"Main Hall" => MAIN_DAY_CAPACITY})
       sales = counts()
-      event_stats = sales[:tickets].sort_by {|name, count| -count}.map {|name, count| {label: name, value: count}}
+      event_stats = sales[:tickets]
+        .sort_by {|name, count| -count}
+        .map {|name, count| {label: name + remaining(capacities, count), value: count}}
       send_event('tickets', {title: "#{sales[:total]} tickets purchased", moreinfo: "Total #{sales[:total]}", items: event_stats})
       day1Tickets = sales[:tickets][DT2018_DAY1_KEYNOTE]
-      send_event('keynotes', {moreinfo: "#{day1Tickets}/#{600}", value: day1Tickets})
-      send_event('workshops', {moreinfo: "#{sales[:total] - day1Tickets}/#{236}", value: sales[:total] - day1Tickets})
+      send_event('keynotes', {max: MAIN_DAY_CAPACITY, moreinfo: "#{day1Tickets}/#{MAIN_DAY_CAPACITY}", value: day1Tickets})
+      send_event('workshops', {max: WORKSHOP_CAPACITY, moreinfo: "#{sales[:total] - day1Tickets}/#{WORKSHOP_CAPACITY}", value: sales[:total] - day1Tickets})
     end
   rescue => e
     puts e.backtrace
@@ -46,6 +61,13 @@ class DevternityFirebaseStats
   end
 
   private
+
+  def remaining(capacities, count)
+    max = capacities.max_by{|k,v| v}
+    capacities.delete(max.first)
+    " (#{max.last - count} left in #{max.first})"
+  end
+
   def raw_applications
     response = @client.get('/applications')
     raise Error.new "DT error #{response.code}" unless response.success?
@@ -91,5 +113,5 @@ class DevternityFirebaseStats
 
 end
 
-SCHEDULER.every '1h', DevternityFirebaseStats.new($firebase_config)
+SCHEDULER.every '15m', DevternityFirebaseStats.new($firebase_config)
 SCHEDULER.at Time.now, DevternityFirebaseStats.new($firebase_config)
