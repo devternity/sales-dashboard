@@ -65,7 +65,7 @@ class DevternityFirebaseStats
   def remaining(capacities, count)
     max = capacities.max_by{|k,v| v}
     capacities.delete(max.first)
-    " (#{max.last - count} left in #{max.first})"
+    " (#{max.last - count} out of #{max.last} left in #{max.first})"
   end
 
   def raw_applications
