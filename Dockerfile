@@ -5,9 +5,9 @@ RUN apt-get -y -q update && \
 
 RUN apt-get -y -q install ruby ruby-dev nodejs g++ bundler
 
-RUN mkdir -p /opt/dashing && \
-    cd /opt/dashing && \
-    gem install dashing && \
+RUN mkdir -p /opt/smashing && \
+    cd /opt/smashing && \
+    gem install smashing && \
     gem install rspec
 
 VOLUME /app
@@ -15,9 +15,4 @@ WORKDIR /app
 
 EXPOSE 3030
 
-CMD ["bash", "-c", \
-  "echo Setting up dependencies && \
-   bundle install --path /app/vendor && \
-   echo && \
-   echo Starting up dashing on http://127.0.0.1:3030/sales && \
-   dashing start -P /var/run/thin.pid"]
+CMD ["bash", "-c", "bundle install --path /tmp/bundle && smashing start -P /var/run/thin.pid"]

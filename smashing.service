@@ -1,0 +1,15 @@
+[Unit]
+Description=Smashing Dashboard
+After=syslog.target network.target
+
+[Service]
+Type=simple
+Environment=SINATRA_ACTIVESUPPORT_WARNING=false
+WorkingDirectory=/dashboard/
+ExecStart=/usr/local/bin/smashing start -p 3030 --pid /var/run/thin.pid
+ExecStop=/usr/local/bin/smashing stop --pid /var/run/thin.pid
+StandardOutput=journal+console
+StandardError=journal+console
+
+[Install]
+WantedBy=multi-user.target

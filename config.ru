@@ -1,3 +1,5 @@
+
+require 'active_support'
 require 'dashing'
 require 'yaml'
 
