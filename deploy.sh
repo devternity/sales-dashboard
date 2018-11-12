@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
+set -e
+
 # SSH parameters
 SSH="ssh -o StrictHostKeyChecking=no -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST"
+SCP="scp -o StrictHostKeyChecking=no -i $DEPLOY_KEY"
 
 # Decrypt deployment key
 openssl aes-256-cbc -K $encrypted_1645300b04d0_key -iv $encrypted_1645300b04d0_iv -in deploy.key.enc -out $DEPLOY_KEY -d
@@ -16,12 +19,13 @@ decrypt config/devternity.yml
 decrypt config/firebase.json
 decrypt config/firebase-legacy.json
 
-# Create artifact 
+# Create dashboard artifact 
 rm -rf dashboard.tgz
 tar -czf dashboard.tgz ./config ./assets ./dashboards ./jobs ./public ./widgets ./config.ru ./Gemfile* ./smashing.service
 
-# Copy artifact to remote host
-scp -o StrictHostKeyChecking=no -i $DEPLOY_KEY dashboard.tgz $DEPLOY_USER@$DEPLOY_HOST:/tmp
+# Copy artifacts to remote host
+$SCP dashboard.tgz $DEPLOY_USER@$DEPLOY_HOST:/tmp
+$SCP smashing.nginx $DEPLOY_USER@$DEPLOY_HOST:/tmp
 
 # Deploy dashboard code
 $SSH sudo mkdir -p /dashboard/config

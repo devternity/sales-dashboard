@@ -2,6 +2,7 @@ sudo: required
 language: ruby
 cache: bundler
 script:
+  - set -e
   - bundle install
 deploy:
   skip_cleanup: true
