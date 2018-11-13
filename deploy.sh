@@ -26,6 +26,8 @@ tar -czf dashboard.tgz ./config ./assets ./dashboards ./jobs ./public ./widgets 
 # Copy artifacts to remote host
 $SCP dashboard.tgz $DEPLOY_USER@$DEPLOY_HOST:/tmp
 $SCP smashing.nginx $DEPLOY_USER@$DEPLOY_HOST:/tmp
+rm -rf dashboard.tgz
+rm -rf config/*
 
 # Deploy dashboard code
 $SSH sudo mkdir -p /dashboard/config
