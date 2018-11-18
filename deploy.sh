@@ -29,6 +29,7 @@ rm -rf dashboard.tgz
 rm -rf config/*
 
 # Deploy dashboard code
+$SSH sudo rm -rf /dashboard/*
 $SSH sudo mkdir -p /dashboard/config
 $SSH sudo tar -zxvf /tmp/dashboard.tgz --no-same-owner -C /dashboard
 
