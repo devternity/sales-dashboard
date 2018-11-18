@@ -28,11 +28,6 @@ $SCP smashing.nginx $DEPLOY_USER@$DEPLOY_HOST:/tmp
 rm -rf dashboard.tgz
 rm -rf config/*
 
-# Deploy dashboard code
-$SSH sudo rm -rf /dashboard/*
-$SSH sudo mkdir -p /dashboard/config
-$SSH sudo tar -zxvf /tmp/dashboard.tgz --no-same-owner -C /dashboard
-
 # Create or renew certificate
 # TODO: if does not exist or expired
 # $SSH sudo systemctl stop nginx
@@ -49,6 +44,11 @@ rm -rf ./cloudflare.ini
 $SSH <<EOF
   echo ">>>> Stopping service"
   sudo systemctl stop smashing 
+  echo ">>>> Deploy dashboard code"
+  sudo rm -rf /dashboard/*
+  sudo mkdir -p /dashboard/config
+  sudo tar -zxvf /tmp/dashboard.tgz --no-same-owner -C /dashboard
+  echo ">>>> Deploy proxy"
   sudo apt-get -y install nginx
   yes | sudo cp -rf /tmp/smashing.nginx /etc/nginx/sites-available/default
   echo ">>>> Installing bundler"
