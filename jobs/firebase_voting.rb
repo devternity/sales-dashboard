@@ -24,7 +24,7 @@ $firebase_client = Firebase::Client.new($base_url, $firebase_json)
 def raw_votes()
   response = $firebase_client.get("votes")
   raise "DT error #{response.code} (#{response.body})" unless response.success?
-  response.body
+  response.body || []
 end
 
 def today_votes(votes = raw_votes())
@@ -46,12 +46,18 @@ def group_by_color(votes = today_votes())
 end
 
 def group_by_time_slot(votes = today_votes(), time_slots = time_slots())
-  votes.group_by { |id, vote|
+  mapping = votes.group_by { |id, vote|
     time_slots.find { |time_slot| 
       vote["created"] >= (time_slot[:end] - 20.minutes).to_f && 
       vote["created"] <= (time_slot[:end] + 20.minutes).to_f
     }
   }
+  time_slots.each do |time_slot|
+    if !mapping.key?(time_slot)
+      mapping[time_slot] = []
+    end
+  end
+  return mapping
 end
 
 def group_by_speech(track, votes = today_votes(), speeches = speeches())
@@ -79,7 +85,7 @@ def group_by_track(votes = today_votes())
   votes_by_track = { "track1": [], "track2": [], "track3": [] }
   device_track_mapping.each do |track, devices|
     devices.each do |device|
-      votes_by_track[track] += votes_by_device[device]
+      votes_by_track[track] += votes_by_device[device] || []
     end
   end  
   return votes_by_track
@@ -162,7 +168,7 @@ COLORS = [
 # Job's schedules.
 ###########################################################################
 
-SCHEDULER.every '1m', :first_in => 0 do |job| 
+SCHEDULER.every '5m', :first_in => 0 do |job| 
 
   speeches = speeches(schedule())
 
@@ -184,10 +190,10 @@ SCHEDULER.every '1m', :first_in => 0 do |job|
         "track": track,
         "time": time_slot,
         "total": green + red + yellow,
-        "optimistic": optimistic,
-        "optimisticPlus": optimisticPlus,
-        "pessimistic": pessimistic,
-        "color": COLORS[ [0, [(COLORS.length * optimisticPlus / 100).round, COLORS.length - 1].min].max ],
+        "optimistic": (optimistic.nan?) ? 0 : optimistic,
+        "optimisticPlus": (optimisticPlus.nan?) ? 0 : optimisticPlus,
+        "pessimistic": (pessimistic.nan?) ? 0 : pessimistic,
+        "color": (!optimisticPlus.nan?) ? COLORS[ [0, [(COLORS.length * optimisticPlus / 100).round, COLORS.length - 1].min].max ] : "#231F20",
         "green": green, 
         "red": red, 
         "yellow": yellow
