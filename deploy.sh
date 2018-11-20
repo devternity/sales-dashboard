@@ -15,8 +15,9 @@ function decrypt() {
   filename="$1"
   openssl enc -aes-256-cbc -pass env:SECRET_PASSWORD -d -a -in "${filename}" -out "${filename}.dec" && rm -f "${filename}" && mv "${filename}.dec" "${filename}"
 } 
-decrypt config/devternity.yml
+decrypt config/integrations.yml
 decrypt config/firebase-sales.json
+decrypt config/firebase-voting.json
 
 # Create dashboard artifact 
 rm -rf dashboard.tgz
