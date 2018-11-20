@@ -1,16 +1,37 @@
 <% content_for(:title) { "DT 2018 Sales" } %>
 <div class="gridster">
   <ul>
-    <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
-      <div data-id="keynotes" data-view="Meter" data-title="Main Day" style="background-color:#231F20;" data-min="0"></div>
+
+    <li data-row="1" data-col="1" data-sizex="2" data-sizey="1">
+      <div data-id="keynotes" 
+           data-view="Meter" 
+           data-title="Main Day" 
+           data-min="0"
+           style="background-color:#231F20;"></div>
     </li>
 
-    <li data-row="2" data-col="1" data-sizex="1" data-sizey="1">
-      <div data-id="workshops" data-view="Meter" data-title="Workshops" style="background-color:#231F20;" data-min="0"></div>
+    <li data-row="1" data-col="2" data-sizex="4" data-sizey="3">
+      <div data-id="tickets" 
+           data-view="List" 
+           data-unordered="true" 
+           style="background-color:#2EA946;font-size: 30px;"></div>
     </li>
 
-    <li data-row="1" data-col="2" data-sizex="3" data-sizey="2">
-      <div data-id="tickets" data-view="List" data-unordered="true" style="background-color:#2EA946;"></div>
+    <li data-row="2" data-col="1" data-sizex="2" data-sizey="1">
+      <div data-id="workshops" 
+           data-view="Meter" 
+           data-title="Workshops" 
+           data-min="0"
+           style="background-color:#231F20;"></div>
     </li>
+
+    <li data-row="3" data-col="1" data-sizex="2" data-sizey="1" 
+        data-banners="logo10">
+      <div data-id="banner" 
+           data-view="Banner" 
+           style="background-color:#231F20;"></div> 
+    </li>                                                                         
+
+
   </ul>
 </div>
