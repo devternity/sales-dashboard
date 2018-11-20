@@ -1,0 +1,74 @@
+// ----------------------------------------------------------------------------
+// Sass declarations
+// ----------------------------------------------------------------------------
+$background-color:  #eb9c3c;
+
+$title-color:       rgba(255, 255, 255, 1);
+$pessimistic-color:       rgba(255, 255, 255, 0.5);
+
+// ----------------------------------------------------------------------------
+// Widget-track styles
+// ----------------------------------------------------------------------------
+.widget-vote {
+
+  background-color: $background-color;
+
+  .session-container {
+    display: none;
+  }
+
+  .title {
+    color: $title-color;
+    padding: 10px;
+    font-size: 20px; 
+    font-style: oblique;
+  }
+
+  .name {
+    padding-left: 5px;
+  }
+
+  .optimistic {
+    font-size: 35px;
+  }
+
+  .pessimistic {
+    font-size: 25px;
+    color: $pessimistic-color;
+  }
+
+  .total {
+    font-size: 25px;
+  }
+
+  .time {
+    font-size: 30px;
+    font-weight: bold;
+  }
+
+  .vote-green {
+    background-color:green;
+    color:white;
+    width:60px;
+  }
+
+  .vote-yellow {
+    background-color:yellow;
+    color:black;
+    width:60px;
+  }
+
+  .vote-red {
+    background-color:red;
+    color:white;
+    width:60px;
+  }
+
+  .speaker-image {
+    border-radius: 100% !important;
+    width: 100px;
+    background-color: white;
+    margin-bottom:10px;
+  }
+
+}

@@ -1,0 +1,46 @@
+
+<div class="session-container">  
+  <table style="width: 85%; margin-left: auto; margin-right: auto; ">  
+    <tbody>
+      <tr>
+        <td style="width: 20%;padding: 10px;">
+          <span data-bind="current_session.time" class="time"></span>
+        </td>
+        <td>
+          <span data-bind="current_session.optimistic | fixed 2 | append '%'" class="optimistic"></span>
+        </td>
+        <td class="vote-green">
+          <span data-bind="current_session.green"></span>
+        </td>
+        <td class="vote-yellow">
+          <span data-bind="current_session.yellow"></span>
+        </td>
+        <td class="vote-red">
+          <span data-bind="current_session.red"></span>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <img data-bind-src="current_session.img" class="speaker-image">          
+        </td>
+        <td colspan="4">
+          <span data-bind="current_session.title" class="title"></span>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <span data-bind="current_session.name" class="author"></span>
+        </td>
+        <td>
+          <span data-bind="current_session.pessimistic | fixed 2 | append '%'" class="pessimistic"></span>
+        </td>
+        <td colspan="3">
+          <span data-bind="current_session.total | append ' vote(s)'" class="total"></span>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+</div>
