@@ -144,7 +144,7 @@ def time_slot_to_obj(time_slot)
   { 
     :name      => time_slot['name'],
     :title     => time_slot['title'],
-    :img       => 'http://devternity.com/' + time_slot['img']
+    :img       => 'https://devternity.com/' + time_slot['img']
   }
 end
 
