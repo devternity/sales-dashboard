@@ -21,15 +21,19 @@ $firebase_config = JSON.parse($firebase_json)
 $base_url = "https://#{$firebase_config['project_id']}.firebaseio.com/"
 $firebase_client = Firebase::Client.new($base_url, $firebase_json)
 
+def now
+  Time.now.in_time_zone('Europe/Riga')
+end
+
 def raw_votes()
   response = $firebase_client.get("votes")
   raise "DT error #{response.code} (#{response.body})" unless response.success?
   response.body || []
 end
 
-def today_votes(votes = raw_votes())
-  from = Time.now.in_time_zone('Europe/Riga').beginning_of_day
-  to   = Time.now.in_time_zone('Europe/Riga').end_of_day
+def filter_by_date(votes = raw_votes(), date = now())
+  from = date.in_time_zone('Europe/Riga').beginning_of_day
+  to   = date.in_time_zone('Europe/Riga').end_of_day
   votes.select { |id, vote| 
     !vote["created"].nil? && 
      vote["created"] >= from.to_i && 
@@ -37,7 +41,7 @@ def today_votes(votes = raw_votes())
   }
 end
 
-def group_by_device(votes = today_votes())
+def group_by_device(votes = filter_by_date(raw_votes(), now()))
   votes.group_by { |id, vote| vote["device"] }
 end
 
@@ -45,7 +49,7 @@ def group_by_color(votes = today_votes())
   votes.group_by { |id, vote| vote["color"] }
 end
 
-def group_by_time_slot(votes = today_votes(), time_slots = time_slots())
+def group_by_time_slot(votes = filter_by_date(raw_votes(), now()), time_slots = time_slots())
   mapping = votes.group_by { |id, vote|
     time_slots.find { |time_slot| 
       vote["created"] >= (time_slot[:end] - 20.minutes).to_f && 
@@ -60,13 +64,13 @@ def group_by_time_slot(votes = today_votes(), time_slots = time_slots())
   return mapping
 end
 
-def group_by_speech(track, votes = today_votes(), speeches = speeches())
+def group_by_speech(track, votes = filter_by_date(raw_votes(), now()), speeches = speeches())
   group_by_time_slot(votes)
     .select { |time_slot, _| !time_slot.nil? }    # filter votes that didn't match any time slot
-    .map { |time_slot, track_votes|               # convert time slot from "{ :start => _, :end => _ }" format into "HH:MM"
+    .map { |time_slot, slot_votes|                # convert time slot from "{ :start => _, :end => _ }" format into "HH:MM"
       [ 
         time_slot[:start].strftime("%H:%M"), 
-        track_votes 
+        slot_votes 
       ] 
     }
     .to_h
@@ -75,12 +79,15 @@ def group_by_speech(track, votes = today_votes(), speeches = speeches())
     } 
 end
 
-def group_by_track(votes = today_votes())
-  device_track_mapping = { 
-    "track1": [ "test_1", "test_4" ], 
-    "track2": [ "test_2" ], 
-    "track3": [ "test_3" ]
+def device_track_mapping
+  { 
+    "track1": $global_config["track_1_devices"] || [ "test_1", "test_4" ], 
+    "track2": $global_config["track_2_devices"] || [ "test_2" ], 
+    "track3": $global_config["track_3_devices"] || [ "test_3" ]
   }
+end
+
+def group_by_track(votes = filter_by_date(raw_votes(), now()), device_track_mapping = device_track_mapping())
   votes_by_device = group_by_device(votes)
   votes_by_track = { "track1": [], "track2": [], "track3": [] }
   device_track_mapping.each do |track, devices|
@@ -100,7 +107,7 @@ def time_slots(schedule = schedule())
     .map { |time|                                 # convert to Time objects in Riga time zone 
       Time.parse(
         time, 
-        Time.now.in_time_zone('Europe/Riga')
+        now()
       ) 
     }
     .each_cons(2)                                 # iterate over pairs of consecutive times
@@ -170,9 +177,27 @@ COLORS = [
 
 SCHEDULER.every '5m', :first_in => 0 do |job| 
 
-  speeches = speeches(schedule())
+  all_votes  = raw_votes()
+  schedule   = schedule()
+  time_slots = time_slots(schedule)
+  speeches   = speeches(schedule)
 
-  votes_by_track = group_by_track(today_votes(raw_votes()))
+  votes_by_track = group_by_track(
+    filter_by_date(
+      all_votes, 
+      ($global_config["voting_day"].nil?) ?
+        now() :
+        Time.parse($global_config["voting_day"], now())
+    )
+  )
+
+  # Add votes from Track 2 on Venkat's opening keynote streaming to Track 1
+  votes_by_track[:track1] += group_by_time_slot(votes_by_track[:track2])
+                               .select { |time_slot, _| !time_slot.nil? }
+                               .select { |time_slot, _| 
+                                  time_slot[:start].strftime("%H:%M") == '09:15' 
+                               }.values.first
+
   votes_by_track.each do |track, track_votes|
     votes_by_track[track] = group_by_speech(track, track_votes, speeches)
     votes_by_track[track].each do |time_slot, slot_votes|
@@ -203,7 +228,7 @@ SCHEDULER.every '5m', :first_in => 0 do |job|
 
   send_event('votes', { votes: votes_by_track })
 
-  today_votes_by_color = group_by_color(today_votes(raw_votes()))
+  today_votes_by_color = group_by_color(filter_by_date(all_votes, now()))
   send_event('greens', { current: (today_votes_by_color["green"] || []).length }) 
 
 end
