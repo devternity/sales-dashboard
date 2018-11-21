@@ -31,25 +31,29 @@ def raw_votes()
   response.body || []
 end
 
-def filter_by_date(votes = raw_votes(), date = now())
-  from = date.in_time_zone('Europe/Riga').beginning_of_day
-  to   = date.in_time_zone('Europe/Riga').end_of_day
-  votes.select { |id, vote| 
-    !vote["created"].nil? && 
-     vote["created"] >= from.to_i && 
-     vote["created"] <= to.to_i 
-  }
+def green_votes()
+  response = $firebase_client.get("votes", { 'orderBy' => '"color"', 'equalTo' => '"green"' })
+  raise "DT error #{response.code} (#{response.body})" unless response.success?
+  response.body || []
 end
 
-def group_by_device(votes = filter_by_date(raw_votes(), now()))
+def votes_for_date(date = now())
+  from = date.in_time_zone('Europe/Riga').beginning_of_day
+  to   = date.in_time_zone('Europe/Riga').end_of_day
+  response = $firebase_client.get("votes", { 'orderBy' => '"created"', 'startAt' => from.to_i, 'endAt' => to.to_i })
+  raise "DT error #{response.code} (#{response.body})" unless response.success?
+  response.body || []
+end
+
+def group_by_device(votes = votes_for_date(now()))
   votes.group_by { |id, vote| vote["device"] }
 end
 
-def group_by_color(votes = today_votes())
+def group_by_color(votes = votes_for_date(now()))
   votes.group_by { |id, vote| vote["color"] }
 end
 
-def group_by_time_slot(votes = filter_by_date(raw_votes(), now()), time_slots = time_slots())
+def group_by_time_slot(votes = votes_for_date(now()), time_slots = time_slots())
   mapping = votes.group_by { |id, vote|
     time_slots.find { |time_slot| 
       vote["created"] >= (time_slot[:end] - 20.minutes).to_f && 
@@ -64,7 +68,7 @@ def group_by_time_slot(votes = filter_by_date(raw_votes(), now()), time_slots = 
   return mapping
 end
 
-def group_by_speech(track, votes = filter_by_date(raw_votes(), now()), speeches = speeches())
+def group_by_speech(track, votes = votes_for_date(now()), speeches = speeches())
   group_by_time_slot(votes)
     .select { |time_slot, _| !time_slot.nil? }    # filter votes that didn't match any time slot
     .map { |time_slot, slot_votes|                # convert time slot from "{ :start => _, :end => _ }" format into "HH:MM"
@@ -87,7 +91,7 @@ def device_track_mapping
   }
 end
 
-def group_by_track(votes = filter_by_date(raw_votes(), now()), device_track_mapping = device_track_mapping())
+def group_by_track(votes = votes_for_date(now()), device_track_mapping = device_track_mapping())
   votes_by_device = group_by_device(votes)
   votes_by_track = { "track1": [], "track2": [], "track3": [] }
   device_track_mapping.each do |track, devices|
@@ -105,10 +109,9 @@ def time_slots(schedule = schedule())
     .uniq
     .sort
     .map { |time|                                 # convert to Time objects in Riga time zone 
-      Time.parse(
-        time, 
-        now()
-      ) 
+      (Time
+        .parse(time, now()) - now().utc_offset
+      ).in_time_zone("Europe/Riga")
     }
     .each_cons(2)                                 # iterate over pairs of consecutive times
     .map { |a| { "start": a[0], "end": a[1] } }   # convert pairs to "{ :start => _, :end => _ }" format
@@ -177,17 +180,15 @@ COLORS = [
 
 SCHEDULER.every '5m', :first_in => 0 do |job| 
 
-  all_votes  = raw_votes()
   schedule   = schedule()
   time_slots = time_slots(schedule)
   speeches   = speeches(schedule)
 
   votes_by_track = group_by_track(
-    filter_by_date(
-      all_votes, 
+    votes_for_date( 
       ($global_config["voting_day"].nil?) ?
         now() :
-        Time.parse($global_config["voting_day"], now())
+        DateTime.parse($global_config["voting_day"], now())
     )
   )
 
@@ -228,7 +229,7 @@ SCHEDULER.every '5m', :first_in => 0 do |job|
 
   send_event('votes', { votes: votes_by_track })
 
-  today_votes_by_color = group_by_color(filter_by_date(all_votes, now()))
+  today_votes_by_color = group_by_color(votes_for_date(now()))
   send_event('greens', { current: (today_votes_by_color["green"] || []).length }) 
 
 end
