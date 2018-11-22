@@ -68,8 +68,8 @@ def group_by_time_slot(votes = votes_for_date(now()), time_slots = time_slots())
   return mapping
 end
 
-def group_by_speech(track, votes = votes_for_date(now()), speeches = speeches())
-  group_by_time_slot(votes)
+def group_by_speech(track, votes = votes_for_date(now()), time_slots = time_slots(schedule(), now()), speeches = speeches(schedule()))
+  group_by_time_slot(votes, time_slots)
     .select { |time_slot, _| !time_slot.nil? }    # filter votes that didn't match any time slot
     .map { |time_slot, slot_votes|                # convert time slot from "{ :start => _, :end => _ }" format into "HH:MM"
       [ 
@@ -102,7 +102,7 @@ def group_by_track(votes = votes_for_date(now()), device_track_mapping = device_
   return votes_by_track
 end
 
-def time_slots(schedule = schedule())
+def time_slots(schedule = schedule(), date = now())
   schedule
     .map { |entry| entry['time'] }                # select slot starting times 
     .map { |time| format_time(time) }             # format it as "HH:MM"
@@ -110,11 +110,21 @@ def time_slots(schedule = schedule())
     .sort
     .map { |time|                                 # convert to Time objects in Riga time zone 
       (Time
-        .parse(time, now()) - now().utc_offset
+        .parse(time, date) - date.utc_offset
       ).in_time_zone("Europe/Riga")
     }
     .each_cons(2)                                 # iterate over pairs of consecutive times
     .map { |a| { "start": a[0], "end": a[1] } }   # convert pairs to "{ :start => _, :end => _ }" format
+end
+
+def voting_day
+  today = now()
+  input = $global_config["voting_day"]
+  input.nil? || input.empty? ? 
+    today : 
+    (Time
+      .parse(input, today) - today.utc_offset
+    ).in_time_zone("Europe/Riga")
 end
 
 def format_time(time_str)
@@ -180,17 +190,12 @@ COLORS = [
 
 SCHEDULER.every '5m', :first_in => 0 do |job| 
 
+  voting_day = voting_day()
   schedule   = schedule()
-  time_slots = time_slots(schedule)
+  time_slots = time_slots(schedule, voting_day)
   speeches   = speeches(schedule)
 
-  votes_by_track = group_by_track(
-    votes_for_date( 
-      ($global_config["voting_day"].nil?) ?
-        now() :
-        DateTime.parse($global_config["voting_day"], now())
-    )
-  )
+  votes_by_track = group_by_track(votes_for_date(voting_day))
 
   # Add votes from Track 2 on Venkat's opening keynote streaming to Track 1
   votes_by_track[:track1] += group_by_time_slot(votes_by_track[:track2])
@@ -200,7 +205,7 @@ SCHEDULER.every '5m', :first_in => 0 do |job|
                                }.values.first
 
   votes_by_track.each do |track, track_votes|
-    votes_by_track[track] = group_by_speech(track, track_votes, speeches)
+    votes_by_track[track] = group_by_speech(track, track_votes, time_slots, speeches)    
     votes_by_track[track].each do |time_slot, slot_votes|
       slot_votes_by_color = group_by_color(slot_votes)
       green = (slot_votes_by_color["green"] || []).length
@@ -229,7 +234,7 @@ SCHEDULER.every '5m', :first_in => 0 do |job|
 
   send_event('votes', { votes: votes_by_track })
 
-  today_votes_by_color = group_by_color(votes_for_date(now()))
+  today_votes_by_color = group_by_color(votes_for_date(voting_day))
   send_event('greens', { current: (today_votes_by_color["green"] || []).length }) 
 
 end
