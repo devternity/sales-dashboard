@@ -14,7 +14,7 @@ $firebase_json = File.open('./config/firebase-sales.json') { |file| file.read }
 $firebase_config = JSON.parse($firebase_json)
 $base_url = "https://#{$firebase_config['project_id']}.firebaseio.com/"
 
-DT2018_PRODUCTS = [ 'DT_RIX_18' ]
+DT2018_PRODUCTS = [ 'DT_RIX_19' ]
 DT2018_DAY1_KEYNOTE = 'Main Day Pass'
 DT2018_ERROR_TICKETS_EVENT = 'Error: Tickets data error'
 
