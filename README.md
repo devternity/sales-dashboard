@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/devternity/sales-dashboard.svg?branch=master)](https://travis-ci.org/devternity/sales-dashboard)
 
 DevTernity Sales Dashboard
 ==========================
