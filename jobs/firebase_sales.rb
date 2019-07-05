@@ -25,6 +25,7 @@ WORKSHOP_CAPACITIES = {
   "KC D" => 44,
   "R 78" => 50,
   "R 75" => 16,
+  "Maza" => 36,
   "R 74" => 9
 }
 
