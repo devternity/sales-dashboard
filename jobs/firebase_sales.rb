@@ -24,7 +24,8 @@ WORKSHOP_CAPACITIES = {
   "KC C" => 45,
   "KC D" => 44,
   "R 78" => 50,
-  "R 75" => 16
+  "R 75" => 16,
+  "R 74" => 9
 }
 
 WORKSHOP_CAPACITY = WORKSHOP_CAPACITIES.map { |k,v| v }.sum
