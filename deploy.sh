@@ -13,7 +13,7 @@ chmod 400 $DEPLOY_KEY
 # Decrypt configuration
 function decrypt() {
   filename="$1"
-  openssl enc -aes-256-cbc -pass env:SECRET_PASSWORD -d -a -in "${filename}" -out "${filename}.dec" && rm -f "${filename}" && mv "${filename}.dec" "${filename}"
+  openssl enc -aes-256-cbc -md md5 -pass env:SECRET_PASSWORD -d -a -in "${filename}" -out "${filename}.dec" && rm -f "${filename}" && mv "${filename}.dec" "${filename}"
 } 
 decrypt config/integrations.yml
 decrypt config/firebase-sales.json
