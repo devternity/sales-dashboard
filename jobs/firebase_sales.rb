@@ -105,7 +105,7 @@ class DevternityFirebaseStats
       return dt2018_data.map { |id, application|
         tickets = application['tickets'] || [DT2018_ERROR_TICKETS_EVENT]
         tickets = [ tickets ] unless tickets.is_a? Array
-        tickets = tickets.map { |ticket| ticket['event'] || DT2018_ERROR_TICKETS_EVENT }
+        tickets = tickets.compact.map { |ticket| ticket['event'] || DT2018_ERROR_TICKETS_EVENT }
         [ id, { tickets: tickets } ]
       }.to_h
     else 
