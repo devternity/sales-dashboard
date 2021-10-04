@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
+set -x 
 
 # SSH parameters
 SSH="ssh -o StrictHostKeyChecking=no -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST"
