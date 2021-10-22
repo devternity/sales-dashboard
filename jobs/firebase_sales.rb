@@ -19,15 +19,14 @@ DT2018_DAY1_KEYNOTE = 'Main Day Pass'
 DT2018_ERROR_TICKETS_EVENT = 'Error: Tickets data error'
 
 WORKSHOP_CAPACITIES = {
-  "KC A" => 36,
-  "KC B" => 45,
-  "KC C" => 45,
-  "KC D" => 44,
-  "R 78" => 50,
-#  "R 75" => 16,
-  "F 11" => 50,
-  "F 12" => 25
-#   "R 74" => 9
+  "1" => 45,
+  "2" => 45,
+  "3" => 45,
+  "4" => 45,
+  "5" => 45,
+  "6" => 45,
+  "7" => 45,
+  "8" => 45
 }
 
 WORKSHOP_CAPACITY = WORKSHOP_CAPACITIES.map { |k,v| v }.sum
