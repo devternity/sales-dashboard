@@ -87,7 +87,7 @@ GEM
     ruby2_keywords (0.0.5)
     rufus-scheduler (3.8.0)
       fugit (~> 1.1, >= 1.1.6)
-    sassc (2.4.0)
+    sassc (2.1.0-x86_64-linux)
       ffi (~> 1.9)
     signet (0.16.0)
       addressable (~> 2.8)
@@ -139,6 +139,7 @@ DEPENDENCIES
   activesupport
   firebase
   pry-byebug
+  sassc (= 2.1.0)
   smashing
   tzinfo-data
 
