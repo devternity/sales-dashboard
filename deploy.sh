@@ -41,7 +41,7 @@ $SSH sudo apt-get -y install docker-ce
 # Install ruby
 $SSH sudo apt-get -y install ruby ruby-dev nodejs g++ bundler sqlite3 libsqlite3-dev
 $SSH sudo gem install bundler
-$SSH sudo gem install smashing
+$SSH sudo gem install smashing --debug --backtrace --verbose
 $SSH sudo gem install rspec
 
 # Create or renew certificate
